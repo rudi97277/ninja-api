@@ -3,16 +3,21 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
+  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateNinjaDto } from './dto/create-ninja.dto';
 import { UpdateNinjaDto } from './dto/update-ninja.dto';
 import { NinjasService } from './ninjas.service';
+import { BeltGuard } from 'src/belt/belt.guard';
 
 @Controller('ninjas')
+@UseGuards(BeltGuard)
 export class NinjasController {
   constructor(private readonly ninjaService: NinjasService) {}
   // GET /ninjas?weapon=fast --> []
@@ -24,12 +29,16 @@ export class NinjasController {
   // GET /ninjas/:id --> { ... }
   @Get(':id')
   getOneNinja(@Param('id') id: string) {
-    return this.ninjaService.getNinja(+id);
+    try {
+      return this.ninjaService.getNinja(+id);
+    } catch (err) {
+      throw new NotFoundException();
+    }
   }
 
   // POST /ninjas
   @Post()
-  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+  createNinja(@Body(new ValidationPipe()) createNinjaDto: CreateNinjaDto) {
     return this.ninjaService.createNinja(createNinjaDto);
   }
   // PUT /ninjas/:id --> { ... }

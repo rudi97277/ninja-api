@@ -18,7 +18,7 @@ export class NinjasService {
 
   getNinja(id: number) {
     const ninja = this.ninjas.find((ninja) => ninja.id === id);
-    if (!ninja) throw new HttpException('ninja not found', 404);
+    if (!ninja) throw new Error('ninja not found');
 
     return ninja;
   }
